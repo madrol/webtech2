@@ -144,6 +144,7 @@ app.controller('myCtrl', function($rootScope, $scope, $window, $route, $http, $l
 	};
 	$scope.logout = function(){
 		$window.localStorage.setItem('user', undefined);
+		$rootScope.currentUser = undefined;
 		$location.path("/login");
 	};
 
