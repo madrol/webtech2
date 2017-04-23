@@ -64,7 +64,7 @@ app.controller('listCtrl', function($scope, $http){
 app.controller('myCtrl', function($rootScope, $scope, $window, $route, $http, $location) {
 	$rootScope.chosenMovie = {};
 	$rootScope.$on("$routeChangeStart", function(event, next, current){
-		if($window.localStorage.getItem('user') === 'undefined'){
+		if($window.localStorage.getItem('user') == undefined){
 			$rootScope.currentUser = undefined;
 			if(next.originalPath === "/login"){
 				$location.path("/login");

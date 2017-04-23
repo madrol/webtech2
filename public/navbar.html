@@ -3,14 +3,14 @@
 	<div class="navbar-header">
 	  <a class="navbar-brand" href="#/">Cinema</a>
 	</div>
-	<ul ng-if="currentUser === undefined"class="nav navbar-nav">
-	  <li><a href="#/home">Home</a></li>
+	<ul ng-if="currentUser == undefined"class="nav navbar-nav">
+	  <li><a href="#/">Home</a></li>
 	</ul>
 	<ul ng-if="currentUser != undefined"class="nav navbar-nav">
 	  <li><a href="#/home">Home</a></li>
 	  <li><a href="#/list">List movies</a></li>
 	</ul>
-	<ul ng-if="currentUser === undefined" class="nav navbar-nav navbar-right">
+	<ul ng-if="currentUser == undefined" class="nav navbar-nav navbar-right">
 	  <li><a href="#/login">Login</a></li>
 	</ul>
 	<ul ng-if="currentUser != undefined" class="nav navbar-nav navbar-right">
