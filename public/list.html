@@ -1,0 +1,49 @@
+<div ng-controller="listCtrl">
+	<div class="container">
+		<h4>Filters</h4>
+		<form class="form-vertical col-sm-4">
+			<div class="form-group form-group-sm">
+				<label>Cinema:</label>
+				<select class="form-control" ng-model="currentCinema">
+					<option value="">
+					</option>
+					<option ng-repeat="x in cinemas" value="{{x}}">
+						{{x}}
+					</option>
+				</select>
+			</div>
+
+			<div class="form-group form-group-sm">
+				<label>Genre:</label>
+				<select class="form-control" ng-model="currentGenre">
+					<option value="">
+					</option>
+					<option ng-repeat="x in genres" value="{{x}}">
+						{{x}}
+					</option>
+				</select>
+			</div>
+
+			<div class="form-group"> 
+				<button class="btn btn-default" ng-click="applyFilters()">Apply filters</button>
+				<button class="btn btn-default" ng-click="clearFilters()">Clear filters</button>
+			</div>
+		</form>
+	</div>
+	<div class="container">
+		<table class="table table-striped">
+		<tr>
+			<th>MOVIE</th>
+			<th>GENRE</th>
+			<th>CINEMA</th>
+			<th></th>
+		</tr>
+		<tr ng-repeat="x in movies | orderBy: 'movie' | filter: genreFilter | filter: cinemaFilter">
+			<td>{{x.movie}}</td>
+			<td>{{x.genre}}</td>
+			<td>{{x.cinema}}</td>
+			<td><button class="btn btn-success btn-block" type="button" ng-click="chooseMovie(x)">NEXT</button></td>
+		</tr>
+		</table>
+	</div>
+</div>

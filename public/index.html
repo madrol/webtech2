@@ -1,0 +1,232 @@
+<html>
+<head>
+<title>Cinema</title>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<link rel="stylesheet" type="text/css" href="css/cinema.css">
+<script src="js/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+	<div ng-include="'navbar.html'"></div>
+	<div ng-view></div>
+<script>
+var app = angular.module('myApp', ["ngRoute"]);
+app.config(function($routeProvider){
+	$routeProvider
+	.when("/", {
+		templateUrl : "home.html"
+	})
+	.when("/list", {
+		templateUrl : "list.html"
+	})
+	.when("/edit", {
+		templateUrl : "editDetails.html"
+	})
+	.when("/shows", {
+		templateUrl : "showList.html"
+	})
+	.when("/purchase", {
+		templateUrl : "seatSelection.html"
+	})
+	.when("/login", {
+		templateUrl : "login.html"
+	})
+	.otherwise({
+		redirectTo : "/"
+	});
+});
+app.controller('listCtrl', function($scope, $http){
+	$http.get("/movies").then(function(response) {
+		$scope.movies = response.data;
+	});
+	$http.get("/cinemas").then(function(response) {
+		$scope.cinemas = response.data;
+	});
+
+	$http.get("/genres").then(function(response) {
+		$scope.genres = response.data;
+	});
+
+
+	$scope.applyFilters = function(){
+		$scope.genreFilter = $scope.currentGenre;
+		$scope.cinemaFilter = $scope.currentCinema;
+	};
+	
+	$scope.clearFilters = function(){
+		$scope.genreFilter = "";
+		$scope.cinemaFilter = "";
+		$scope.currentGenre = "";
+		$scope.currentCinema = "";
+	};
+});
+app.controller('myCtrl', function($rootScope, $scope, $window, $route, $http, $location) {
+	$rootScope.chosenMovie = {};
+	$rootScope.$on("$routeChangeStart", function(event, next, current){
+		if($window.localStorage.getItem('user') === 'undefined'){
+			$rootScope.currentUser = undefined;
+			if(next.originalPath === "/login"){
+				$location.path("/login");
+			}else{
+				$location.path("/");
+			}
+		}else{
+			$rootScope.currentUser = JSON.parse($window.localStorage.getItem('user'));
+			if(next.originalPath === "/login"){
+				$location.path("/");
+			}else if(next.originalPath === "/purchase" && $window.localStorage.getItem('show') != 'null'){
+				$rootScope.chosenShow = JSON.parse($window.localStorage.getItem('show'));
+				$rootScope.chosenMovie = JSON.parse($window.localStorage.getItem('movie'));
+				$scope.chooseShow($rootScope.chosenShow);
+			}
+			else if(next.originalPath === "/shows" && $window.localStorage.getItem('movie') != 'null'){
+				$rootScope.chosenMovie = JSON.parse($window.localStorage.getItem('movie'));
+				$scope.shows = $rootScope.chosenMovie.shows;
+			}else if(next.originalPath === "/shows" && $window.localStorage.getItem('movie') == 'null'){
+				$location.path("/");
+			}
+			else if(next.originalPath === "/purchase" && $window.localStorage.getItem('show') == 'null'){
+				$location.path("/");
+			}
+			else{
+				$window.localStorage.setItem('movie', 'null');
+				$window.localStorage.setItem('show', 'null');
+			}
+		}
+	}); 
+	$rootScope.loginUser = {"uname": "testuser", "pw": "test"};
+	/*
+	if($window.localStorage.getItem('user') === 'undefined'){
+		$rootScope.currentUser = undefined;
+	}else{
+		$rootScope.currentUser = JSON.parse($window.localStorage.getItem('user'));
+	}*/
+	$scope.nrow = 8;
+	$scope.ncol = 8;
+	
+	$scope.seatColors = new Array($scope.nrow);
+	$scope.cinema = new Array($scope.nrow);
+	for(var i = 0; i < 8; i++){
+		$scope.seatColors[i] = new Array($scope.ncol);
+		$scope.cinema[i] = new Array($scope.ncol);
+	}
+	
+	$rootScope.chosenSeat = new Array(2);
+	$rootScope.chosenSeat[0] = -1;
+	$rootScope.chosenSeat[1] = -1;
+
+    $scope.setSeat = function(i, j){
+		if($scope.seatColors[i][j] != "red" && $scope.seatColors[i][j] != "orange"){
+			if($rootScope.chosenSeat[0] != -1){
+				$scope.seatColors[$rootScope.chosenSeat[0]][$rootScope.chosenSeat[1]] = "green";
+			}
+			$scope.seatColors[i][j] = "yellow";
+			$rootScope.chosenSeat[0] = i;
+			$rootScope.chosenSeat[1] = j;	
+		}
+	};
+
+	$scope.login = function(){
+		$http.post("/login", $rootScope.loginUser).then(
+			function(response){
+				if(response.data === ""){
+					alert("Error!");
+				}else{
+					$rootScope.currentUser = response.data;
+					$window.localStorage.setItem('user', JSON.stringify(response.data)); 
+					alert("Welcome: " + JSON.parse($window.localStorage.getItem('user')).uname + "!");
+					$route.reload();
+					$location.path("/home");
+				}
+			}
+		);
+	};
+	$scope.logout = function(){
+		$window.localStorage.setItem('user', undefined);
+		$location.path("/login");
+	};
+
+	$scope.changeProfile = function(oldpw){
+		if($rootScope.currentUser.name == "" || $rootScope.currentUser.name == undefined){
+			alert("Error: name is empty!");
+		}else if($rootScope.currentUser.pw == "" || $rootScope.currentUser.pw == undefined){
+			alert("Error: new password is empty!");
+		}else{
+			$http.post("/edit", $rootScope.currentUser).then(
+				function(response){
+					if(response.status != 200){
+						alert("Error!");
+					}else{
+						if($rootScope.currentUser.pw == undefined || $rootScope.currentUser.pw == ""){
+							$rootScope.currentUser.pw = oldpw;
+						}
+						$window.localStorage.setItem('user', JSON.stringify($rootScope.currentUser));
+						alert("Success!");
+						$location.path("/home");
+					}
+				}
+			);
+		}
+	};
+	$scope.check = function(oldpw){
+		if(oldpw == JSON.parse($window.localStorage.getItem('user')).pw){
+			return false;
+		}else{
+			return true;
+		}
+	};
+	$scope.chooseMovie = function(movie){
+		$window.localStorage.setItem('movie', JSON.stringify(movie));
+		$rootScope.chosenMovie = movie;
+		$rootScope.shows = movie.shows;
+		$location.path("/shows");
+	};
+	$scope.chooseShow = function(show){
+		$window.localStorage.setItem('show', JSON.stringify(show));
+		$rootScope.chosenShow = show;
+		$rootScope.chosenSeat = {};
+		$rootScope.chosenSeat[0] = -1;
+		$rootScope.chosenSeat[1] = -1;
+		var data = {"movie": $rootScope.chosenMovie.id, "show": $rootScope.chosenShow.id};
+		$http.post("/reservations", data).then(function(response) {
+			$scope.reservations = response.data;
+			for(var i = 0; i < $scope.nrow; i++){
+				for(var j = 0; j < $scope.ncol; j++){
+						$scope.cinema[i][j] = "S";
+						$scope.seatColors[i][j] = "green";
+				}
+			}			
+			for(var i = 0; i < $scope.reservations.length; i++){
+				if($scope.reservations[i].user === JSON.parse($window.localStorage.getItem('user')).uname){
+					$scope.seatColors[$scope.reservations[i].x][$scope.reservations[i].y] = "orange";
+					$scope.cinema[$scope.reservations[i].x][$scope.reservations[i].y] = "Y";
+				}else{
+					$scope.seatColors[$scope.reservations[i].x][$scope.reservations[i].y] = "red";
+				}
+			}
+			$location.path("/purchase");
+		});
+	}
+	$scope.buyTicket = function(){
+		if($rootScope.chosenSeat[0] != -1){
+			var myData = {"movie": (JSON.parse($window.localStorage.getItem('movie'))), "seatx": $rootScope.chosenSeat[0], "seaty": $rootScope.chosenSeat[1], "uname": JSON.parse($window.localStorage.getItem('user')).uname, "show": (JSON.parse($window.localStorage.getItem('show')))};
+			$http.post("/buy", myData).then(
+				function(response){
+					if(response.status != 200){
+						alert("Error!");
+					}else{
+						alert("Success!");
+						$location.path("/list");
+					}
+				}
+			);
+		}else{
+			alert("Chose a seat!");
+		}
+	};
+});
+
+</script>
+</body>
+</html>

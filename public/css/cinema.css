@@ -1,0 +1,29 @@
+.seats {
+    margin: 10px;
+    border-collapse: separate;
+    border-spacing: 10px;
+	background-color: black;
+	table-layout: fixed;
+
+	height: 300px;
+	width: 300px;
+}
+.seats tr {
+   height: 20%;
+}
+
+
+.seat{
+    width: 20%;
+    height: 20%;
+	text-align: center;
+	border: 1pt solid black;
+	padding: 10px;
+	margin: 10px;
+	font-size: 10px;
+	
+    border-radius: 10px;
+	
+	background-color: green;
+	border-color: grey;
+}

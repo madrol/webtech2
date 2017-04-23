@@ -1,0 +1,22 @@
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+	<div class="navbar-header">
+	  <a class="navbar-brand" href="#/">Cinema</a>
+	</div>
+	<ul ng-if="currentUser === undefined"class="nav navbar-nav">
+	  <li><a href="#/home">Home</a></li>
+	</ul>
+	<ul ng-if="currentUser != undefined"class="nav navbar-nav">
+	  <li><a href="#/home">Home</a></li>
+	  <li><a href="#/list">List movies</a></li>
+	</ul>
+	<ul ng-if="currentUser === undefined" class="nav navbar-nav navbar-right">
+	  <li><a href="#/login">Login</a></li>
+	</ul>
+	<ul ng-if="currentUser != undefined" class="nav navbar-nav navbar-right">
+		<li><a>Logged in as: {{currentUser.uname}}</a></li>
+		<li><a href="#/edit" >Edit details</a></li>		
+		<li><button class="btn btn-lg btn-warning" ng-click="logout()"> Log out</button></li>
+	</ul>
+  </div>
+</nav>

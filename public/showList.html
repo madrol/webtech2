@@ -1,0 +1,14 @@
+<div class="container">
+	<table class="table table-striped">
+	<tr>
+		<th>DATE</th>
+		<th>TIME</th>
+		<th></th>
+	</tr>
+	<tr ng-repeat="x in shows | orderBy: 'date'">
+		<td>{{x.date}}</td>
+		<td>{{x.time}}</td>
+		<td><button class="btn btn-success btn-block" type="button" ng-click="chooseShow(x)">NEXT</button></td>
+	</tr>
+	</table>
+</div>

@@ -1,0 +1,21 @@
+<div class="row well">
+	<div class="col-sm-4">
+		<h3>Chosen movie: {{chosenMovie.movie}}</h3>
+		<h3>Chosen cinema: {{chosenMovie.cinema}}</h3>
+		<h3>Date: {{chosenShow.date}}</h3>
+		<h3>Time: {{chosenShow.time}}</h3>
+		<h3>Choose a free seat now!</h3>
+	</div>
+	<div class="col-sm-5 table-responsive">
+		<table class="seats">
+			<tr ng-repeat="i in [0, 1, 2, 3, 4]">
+				<td ng-click="setSeat(i, j)" ng-repeat="j in [0, 1, 2, 3, 4]" class="seat col-md-1" style="background-color:{{seatColors[i][j]}}">{{cinema[i][j]}}</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<button type="submit" class="btn btn-success btn-block" ng-click="buyTicket()">Buy</button>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
